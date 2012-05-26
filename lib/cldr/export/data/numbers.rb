@@ -33,12 +33,6 @@ module Cldr
             }
           )
         end
-      
-        def currency
-          currency = format('currency')
-          currency.update(:unit => unit) unless unit.empty?
-          currency
-        end
 
         def symbols
           select('numbers/symbols/*').inject({}) do |result, node|
@@ -48,9 +42,12 @@ module Cldr
         end
 
         def format(type)
-          select("numbers/#{type}Formats/#{type}FormatLength/#{type}Format/pattern").inject({}) do |result, node|
-            node.content unless draft?(node)
+          latin = select("numbers/#{type}Formats[@numberSystem=\"latn\"]/#{type}FormatLength/#{type}Format/pattern")
+          (latin || select("numbers/#{type}Formats/#{type}FormatLength/#{type}Format/pattern")).each do |node|
+            return node.content unless draft?(node) || node.attribute('type')
           end
+
+          {}
         end
 
         def unit

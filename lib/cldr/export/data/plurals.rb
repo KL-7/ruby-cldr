@@ -20,18 +20,18 @@ module Cldr
             File.read("#{Cldr::Export::Data.dir}/supplemental/plurals.xml")
           end
         end
-    
+
         attr_reader :locale
 
         def initialize(locale)
           @locale = locale
           super(rule ? ruby : "")
         end
-    
+
         def ruby
           "{ :#{locale} => { :i18n => {:plural => { :keys => #{rule.keys.inspect}, :rule => #{rule.to_ruby} } } } }"
         end
-    
+
         def rule
           @rule = Plurals.rules.rule(locale)
         end
